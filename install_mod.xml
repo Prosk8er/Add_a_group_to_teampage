@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+		<title lang="en"><![CDATA[Add groups in team page & Legend repositioning]]></title>
+		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.9.]]></description>
+		<author-notes lang="en"><![CDATA[Thank phpbb for there awesome code and mike over at http://stargate-portal.com for his help with the umil installer.]]></author-notes>
+		<author-group>
+			<author>
+				<realname><![CDATA[Tyler]]></realname>
+				<username><![CDATA[bprsk8r4272]]></username>
+				<homepage><![CDATA[http://gotskillslounge.com]]></homepage>
+				<email><![CDATA[prosk8er@gotskillslounge.com]]></email>
+			</author>
+			<author>
+				<realname><![CDATA[Mike]]></realname>
+				<username><![CDATA[michaelo]]></username>
+				<homepage><![CDATA[http://stargate-portal.com]]></homepage>
+			</author>
+			<author>
+				<realname><![CDATA[phpBB Group]]></realname>
+				<username phpbbcom="no"><![CDATA[phpBB Group]]></username>
+				<homepage><![CDATA[http://www.phpbb.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version>0.1.0</mod-version>
+		<installation>
+			<level>easy</level>
+			<time>900</time>
+			<target-version>3.0.9</target-version>
+		</installation>
+		<history>
+			<entry>
+				<date>2011-07-23</date>
+				<rev-version>0.1.0</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Initial Release]]></change>
+				</changelog>
+			</entry>
+		</history>
+		<link-group>
+			<link type="template" href="contrib/subsilver2.xml" lang="en">Subsilver2</link>
+		</link-group>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/*.*" to="*.*"/>
+		</copy>
+		<open src="index.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 39]]></comment>
+				<find><![CDATA[// Grab group details for legend display
+if ($auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel'))
+{
+	$sql = 'SELECT group_id, group_name, group_colour, group_type
+		FROM ' . GROUPS_TABLE . '
+		WHERE group_legend = 1
+		ORDER BY group_name ASC';
+}
+else
+{
+	$sql = 'SELECT g.group_id, g.group_name, g.group_colour, g.group_type
+		FROM ' . GROUPS_TABLE . ' g]]></find>
+				<action type="replace-with"><![CDATA[$order_legend = ($config['legend_sort_groupname']) ? 'group_name' : 'group_legend';
+// Grab group details for legend display
+if ($auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel'))
+{
+	$sql = 'SELECT group_id, group_name, group_colour, group_type, group_legend
+		FROM ' . GROUPS_TABLE . '
+		WHERE group_legend > 0
+		ORDER BY ' . $order_legend . ' ASC';
+}
+else
+{
+	$sql = 'SELECT g.group_id, g.group_name, g.group_colour, g.group_type, g.group_legend
+		FROM ' . GROUPS_TABLE . ' g]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 58]]></comment>
+				<find><![CDATA[		WHERE g.group_legend = 1
+			AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $user->data['user_id'] . ')
+		ORDER BY g.group_name ASC';
+}
+$result = $db->sql_query($sql);]]></find>
+				<action type="replace-with"><![CDATA[		WHERE g.group_legend > 0
+			AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $user->data['user_id'] . ')
+		ORDER BY g.' . $order_legend . ' ASC';
+}
+$result = $db->sql_query($sql);]]></action>
+			</edit>
+		</open>
+		<open src="memberlist.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 80]]></comment>
+				<find><![CDATA[		$user_ary = $auth->acl_get_list(false, array('a_', 'm_'), false);
+
+		$admin_id_ary = $global_mod_id_ary = $mod_id_ary = $forum_id_ary = array();
+		foreach ($user_ary as $forum_id => $forum_ary)
+		{
+			foreach ($forum_ary as $auth_option => $id_ary)
+			{
+				if (!$forum_id)
+				{
+					if ($auth_option == 'a_')
+					{
+						$admin_id_ary = array_merge($admin_id_ary, $id_ary);
+					}
+					else
+					{
+						$global_mod_id_ary = array_merge($global_mod_id_ary, $id_ary);
+					}
+					continue;
+				}
+				else
+				{
+					$mod_id_ary = array_merge($mod_id_ary, $id_ary);
+				}
+
+				if ($forum_id)
+				{
+					foreach ($id_ary as $id)
+					{
+						$forum_id_ary[$id][] = $forum_id;
+					}
+				}
+			}
+		}
+
+		$admin_id_ary = array_unique($admin_id_ary);
+		$global_mod_id_ary = array_unique($global_mod_id_ary);
+
+		$mod_id_ary = array_merge($mod_id_ary, $global_mod_id_ary);
+		$mod_id_ary = array_unique($mod_id_ary);
+
+		// Admin group id...
+		$sql = 'SELECT group_id
+			FROM ' . GROUPS_TABLE . "
+			WHERE group_name = 'ADMINISTRATORS'";
+		$result = $db->sql_query($sql);
+		$admin_group_id = (int) $db->sql_fetchfield('group_id');
+		$db->sql_freeresult($result);
+
+		// Get group memberships for the admin id ary...
+		$admin_memberships = group_memberships($admin_group_id, $admin_id_ary);
+
+		$admin_user_ids = array();
+
+		if (!empty($admin_memberships))
+		{
+			// ok, we only need the user ids...
+			foreach ($admin_memberships as $row)
+			{
+				$admin_user_ids[$row['user_id']] = true;
+			}
+		}
+		unset($admin_memberships);
+
+		$sql = 'SELECT forum_id, forum_name
+			FROM ' . FORUMS_TABLE;
+		$result = $db->sql_query($sql);
+
+		$forums = array();
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$forums[$row['forum_id']] = $row['forum_name'];
+		}
+		$db->sql_freeresult($result);
+
+		$sql = $db->sql_build_query('SELECT', array(
+			'SELECT'	=> 'u.user_id, u.group_id as default_group, u.username, u.username_clean, u.user_colour, u.user_rank, u.user_posts, u.user_allow_pm, g.group_id, g.group_name, g.group_colour, g.group_type, ug.user_id as ug_user_id',
+
+			'FROM'		=> array(
+				USERS_TABLE		=> 'u',
+				GROUPS_TABLE	=> 'g'
+			),
+
+			'LEFT_JOIN'	=> array(
+				array(
+					'FROM'	=> array(USER_GROUP_TABLE => 'ug'),
+					'ON'	=> 'ug.group_id = g.group_id AND ug.user_pending = 0 AND ug.user_id = ' . $user->data['user_id']
+				)
+			),
+
+			'WHERE'		=> $db->sql_in_set('u.user_id', array_unique(array_merge($admin_id_ary, $mod_id_ary)), false, true) . '
+				AND u.group_id = g.group_id',
+
+			'ORDER_BY'	=> 'g.group_name ASC, u.username_clean ASC'
+		));
+		$result = $db->sql_query($sql);
+
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$which_row = (in_array($row['user_id'], $admin_id_ary)) ? 'admin' : 'mod';
+
+			// We sort out admins not within the 'Administrators' group.
+			// Else, we will list those as admin only having the permission to view logs for example.
+			if ($which_row == 'admin' && empty($admin_user_ids[$row['user_id']]))
+			{
+				// Remove from admin_id_ary, because the user may be a mod instead
+				unset($admin_id_ary[array_search($row['user_id'], $admin_id_ary)]);
+
+				if (!in_array($row['user_id'], $mod_id_ary) && !in_array($row['user_id'], $global_mod_id_ary))
+				{
+					continue;
+				}
+				else
+				{
+					$which_row = 'mod';
+				}
+			}
+
+			$s_forum_select = '';
+			$undisclosed_forum = false;
+
+			if (isset($forum_id_ary[$row['user_id']]) && !in_array($row['user_id'], $global_mod_id_ary))
+			{
+				if ($which_row == 'mod' && sizeof(array_diff(array_keys($forums), $forum_id_ary[$row['user_id']])))
+				{
+					foreach ($forum_id_ary[$row['user_id']] as $forum_id)
+					{
+						if (isset($forums[$forum_id]))
+						{
+							if ($auth->acl_get('f_list', $forum_id))
+							{
+								$s_forum_select .= '<option value="">' . $forums[$forum_id] . '</option>';
+							}
+							else
+							{
+								$undisclosed_forum = true;
+							}
+						}
+					}
+				}
+			}
+
+			// If the mod is only moderating non-viewable forums we skip the user. There is no gain in displaying the person then...
+			if (!$s_forum_select && $undisclosed_forum)
+			{
+//				$s_forum_select = '<option value="">' . $user->lang['FORUM_UNDISCLOSED'] . '</option>';
+				continue;
+			}
+
+			// The person is moderating several "public" forums, therefore the person should be listed, but not giving the real group name if hidden.
+			if ($row['group_type'] == GROUP_HIDDEN && !$auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel') && $row['ug_user_id'] != $user->data['user_id'])
+			{
+				$group_name = $user->lang['GROUP_UNDISCLOSED'];
+				$u_group = '';
+			}
+			else
+			{
+				$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+				$u_group = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']);
+			}
+
+			$rank_title = $rank_img = '';
+			get_user_rank($row['user_rank'], (($row['user_id'] == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
+
+			$template->assign_block_vars($which_row, array(
+				'USER_ID'		=> $row['user_id'],
+				'FORUMS'		=> $s_forum_select,
+				'RANK_TITLE'	=> $rank_title,
+				'GROUP_NAME'	=> $group_name,
+				'GROUP_COLOR'	=> $row['group_colour'],
+
+				'RANK_IMG'		=> $rank_img,
+				'RANK_IMG_SRC'	=> $rank_img_src,
+
+				'U_GROUP'			=> $u_group,
+				'U_PM'				=> ($config['allow_privmsg'] && $auth->acl_get('u_sendpm') && ($row['user_allow_pm'] || $auth->acl_gets('a_', 'm_') || $auth->acl_getf_global('m_'))) ? append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=pm&amp;mode=compose&amp;u=' . $row['user_id']) : '',
+
+				'USERNAME_FULL'		=> get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']),
+				'USERNAME'			=> get_username_string('username', $row['user_id'], $row['username'], $row['user_colour']),
+				'USER_COLOR'		=> get_username_string('colour', $row['user_id'], $row['username'], $row['user_colour']),
+				'U_VIEW_PROFILE'	=> get_username_string('profile', $row['user_id'], $row['username'], $row['user_colour']),
+			));
+		}
+		$db->sql_freeresult($result);]]></find>
+				<action type="replace-with"><![CDATA[		$sql_ary = array(
+			'SELECT'	=> 'g.group_id, g.group_name, g.group_colour, g.group_type, g.group_teampage, ug.user_id as ug_user_id',
+
+			'FROM'		=> array(GROUPS_TABLE => 'g'),
+
+			'LEFT_JOIN'	=> array(
+				array(
+					'FROM'	=> array(USER_GROUP_TABLE => 'ug'),
+					'ON'	=> 'ug.group_id = g.group_id AND ug.user_pending = 0 AND ug.user_id = ' . (int) $user->data['user_id'],
+				),
+			),
+
+			'WHERE'		=> '',
+
+			'ORDER_BY'	=> 'g.group_teampage ASC',
+		);
+
+		$result = $db->sql_query($db->sql_build_query('SELECT', $sql_ary));
+
+		$group_ids = $groups_ary = array();
+		while ($row = $db->sql_fetchrow($result))
+		{
+			if ($row['group_type'] == GROUP_HIDDEN && !$auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel') && $row['ug_user_id'] != $user->data['user_id'])
+			{
+				$row['group_name'] = $user->lang['GROUP_UNDISCLOSED'];
+				$row['u_group'] = '';
+			}
+			else
+			{
+				$row['group_name'] = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+				$row['u_group'] = append_sid("{$phpbb_root_path}memberlist.$phpEx", 'mode=group&amp;g=' . $row['group_id']);
+			}
+
+			if ($row['group_teampage'])
+			{
+				// Only put groups into the array we want to display.
+				// We are fetching all groups, to ensure we got all data for default groups.
+				$group_ids[] = (int) $row['group_id'];
+			}
+			$groups_ary[(int) $row['group_id']] = $row;
+		}
+		$db->sql_freeresult($result);
+
+		$sql_ary = array(
+			'SELECT'	=> 'u.user_id, u.group_id as default_group, u.username, u.username_clean, u.user_colour, u.user_rank, u.user_posts, u.user_allow_pm, g.group_id',
+
+			'FROM'		=> array(
+				USER_GROUP_TABLE => 'ug',
+			),
+
+			'LEFT_JOIN'	=> array(
+				array(
+					'FROM'	=> array(USERS_TABLE => 'u'),
+					'ON'	=> 'ug.user_id = u.user_id AND ug.user_pending = 0',
+				),
+				array(
+					'FROM'	=> array(GROUPS_TABLE => 'g'),
+					'ON'	=> 'ug.group_id = g.group_id',
+				),
+			),
+
+			'WHERE'		=> $db->sql_in_set('g.group_id', $group_ids, false, true),
+
+			'ORDER_BY'	=> 'u.username_clean ASC',
+		);
+
+		$result = $db->sql_query($db->sql_build_query('SELECT', $sql_ary));
+
+		$user_ary = array();
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$row['forums'] = '';
+			$row['forums_ary'] = array();
+			$user_ary[(int) $row['user_id']] = $row;
+			$user_ids[] = (int) $row['user_id'];
+			$group_users[(int) $row['group_id']][] = (int) $row['user_id'];
+		}
+		$db->sql_freeresult($result);
+
+		if ($config['teampage_forums'])
+		{
+			$template->assign_var('S_DISPLAY_MODERATOR_FORUMS', true);
+			// Get all moderators
+			$perm_ary = $auth->acl_get_list(array_unique($user_ids), array('m_'), false);
+
+			foreach ($perm_ary as $forum_id => $forum_ary)
+			{
+				foreach ($forum_ary as $auth_option => $id_ary)
+				{
+					foreach ($id_ary as $id)
+					{
+						if (!$forum_id)
+						{
+							$user_ary[$id]['forums'] = $user->lang['ALL_FORUMS'];
+						}
+						else
+						{
+							$user_ary[$id]['forums_ary'][] = $forum_id;
+						}
+					}
+				}
+			}
+
+			$sql = 'SELECT forum_id, forum_name
+				FROM ' . FORUMS_TABLE;
+			$result = $db->sql_query($sql);
+
+			$forums = array();
+			while ($row = $db->sql_fetchrow($result))
+			{
+				$forums[$row['forum_id']] = $row['forum_name'];
+			}
+			$db->sql_freeresult($result);
+
+			foreach ($user_ary as $user_id => $user_data)
+			{
+				if (!$user_data['forums'])
+				{
+					foreach ($user_data['forums_ary'] as $forum_id)
+					{
+						$user_ary[$user_id]['forums_options'] = true;
+						if (isset($forums[$forum_id]))
+						{
+							if ($auth->acl_get('f_list', $forum_id))
+							{
+								$user_ary[$user_id]['forums'] .= '<option value="">' . $forums[$forum_id] . '</option>';
+							}
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($groups_ary as $group_id => $group_data)
+		{
+			if ($group_data['group_teampage'])
+			{
+				$template->assign_block_vars('group', array(
+					'GROUP_NAME'	=> $group_data['group_name'],
+					'GROUP_COLOR'	=> $group_data['group_colour'],
+					'U_GROUP'		=> $group_data['u_group'],
+				));
+			}
+
+			// Display group members.
+			if (!empty($group_users[$group_id]))
+			{
+				foreach ($group_users[$group_id] as $user_id)
+				{
+					if (isset($user_ary[$user_id]))
+					{
+						$row = $user_ary[$user_id];
+						if (!$config['teampage_multiple'] && ($group_id != $groups_ary[$row['default_group']]['group_id']) && $groups_ary[$row['default_group']]['group_teampage'])
+						{
+							// Display users in their primary group, instead of the first group, when it is displayed on the teampage.
+							continue;
+						}
+
+						$rank_title = $rank_img = $rank_img_src = '';
+						get_user_rank($row['user_rank'], (($row['user_id'] == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
+
+						$template->assign_block_vars('group.user', array(
+							'USER_ID'		=> $row['user_id'],
+							'FORUMS'		=> $row['forums'],
+							'FORUM_OPTIONS'	=> (isset($row['forums_options'])) ? true : false,
+							'RANK_TITLE'	=> $rank_title,
+
+							'GROUP_NAME'	=> $groups_ary[$row['default_group']]['group_name'],
+							'GROUP_COLOR'	=> $groups_ary[$row['default_group']]['group_colour'],
+							'U_GROUP'		=> $groups_ary[$row['default_group']]['u_group'],
+
+							'RANK_IMG'		=> $rank_img,
+							'RANK_IMG_SRC'	=> $rank_img_src,
+
+							'U_PM'			=> ($config['allow_privmsg'] && $auth->acl_get('u_sendpm') && ($row['user_allow_pm'] || $auth->acl_gets('a_', 'm_') || $auth->acl_getf_global('m_'))) ? append_sid("{$phpbb_root_path}ucp.$phpEx", 'i=pm&amp;mode=compose&amp;u=' . $row['user_id']) : '',
+
+							'USERNAME_FULL'		=> get_username_string('full', $row['user_id'], $row['username'], $row['user_colour']),
+							'USERNAME'			=> get_username_string('username', $row['user_id'], $row['username'], $row['user_colour']),
+							'USER_COLOR'		=> get_username_string('colour', $row['user_id'], $row['username'], $row['user_colour']),
+							'U_VIEW_PROFILE'	=> get_username_string('profile', $row['user_id'], $row['username'], $row['user_colour']),
+						));
+
+						if (!$config['teampage_multiple'])
+						{
+							unset($user_ary[$user_id]);
+						}
+					}
+				}
+			}
+		}]]></action>
+			</edit>
+		</open>
+		<open src="viewonline.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 374]]></comment>
+				<find><![CDATA[// Grab group details for legend display
+if ($auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel'))
+{
+	$sql = 'SELECT group_id, group_name, group_colour, group_type
+		FROM ' . GROUPS_TABLE . '
+		WHERE group_legend = 1
+		ORDER BY group_name ASC';
+}
+else
+{
+	$sql = 'SELECT g.group_id, g.group_name, g.group_colour, g.group_type
+		FROM ' . GROUPS_TABLE . ' g
+		LEFT JOIN ' . USER_GROUP_TABLE . ' ug
+			ON (
+				g.group_id = ug.group_id
+				AND ug.user_id = ' . $user->data['user_id'] . '
+				AND ug.user_pending = 0
+			)
+		WHERE g.group_legend = 1
+			AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $user->data['user_id'] . ')
+		ORDER BY g.group_name ASC';
+}
+$result = $db->sql_query($sql);]]></find>
+				<action type="replace-with"><![CDATA[$order_legend = ($config['legend_sort_groupname']) ? 'group_name' : 'group_legend';
+// Grab group details for legend display
+if ($auth->acl_gets('a_group', 'a_groupadd', 'a_groupdel'))
+{
+	$sql = 'SELECT group_id, group_name, group_colour, group_type, group_legend
+		FROM ' . GROUPS_TABLE . '
+		WHERE group_legend > 0
+		ORDER BY ' . $order_legend . ' ASC';
+}
+else
+{
+	$sql = 'SELECT g.group_id, g.group_name, g.group_colour, g.group_type, g.group_legend
+		FROM ' . GROUPS_TABLE . ' g
+		LEFT JOIN ' . USER_GROUP_TABLE . ' ug
+			ON (
+				g.group_id = ug.group_id
+				AND ug.user_id = ' . $user->data['user_id'] . '
+				AND ug.user_pending = 0
+			)
+		WHERE g.group_legend > 0
+			AND (g.group_type <> ' . GROUP_HIDDEN . ' OR ug.user_id = ' . $user->data['user_id'] . ')
+		ORDER BY g.' . $order_legend . ' ASC';
+}
+$result = $db->sql_query($sql);]]></action>
+			</edit>
+		</open>
+		<open src="adm/style/acp_groups.html">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 69]]></comment>
+				<find><![CDATA[	<dl>
+		<dt><label for="group_legend">{L_GROUP_LEGEND}:</label></dt>
+		<dd><input name="group_legend" type="checkbox" value="1" class="radio" id="group_legend"{GROUP_LEGEND} /></dd>
+	</dl>]]></find>
+				<action type="after-add"><![CDATA[	<dl>
+		<dt><label for="group_teampage">{L_GROUP_TEAMPAGE}:</label></dt>
+		<dd><input name="group_teampage" type="checkbox" value="1" class="radio" id="group_teampage"{GROUP_TEAMPAGE} /></dd>
+	</dl>]]></action>
+			</edit>
+		</open>
+		<open src="includes/functions_user.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 2457]]></comment>
+				<find><![CDATA[	global $phpbb_root_path, $config, $db, $user, $file_upload;]]></find>
+				<action type="after-add"><![CDATA[	global $phpEx;
+
+	include($phpbb_root_path . 'includes/group_positions.' . $phpEx);]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 2473]]></comment>
+				<find><![CDATA[	$err = group_validate_groupname($group_id, $name);
+	if (!empty($err))
+	{
+		$error[] = $user->lang[$err];
+	}
+
+	if (!in_array($type, array(GROUP_OPEN, GROUP_CLOSED, GROUP_HIDDEN, GROUP_SPECIAL, GROUP_FREE)))
+	{
+		$error[] = $user->lang['GROUP_ERR_TYPE'];
+	}
+
+	if (!sizeof($error))
+	{]]></find>
+				<action type="after-add"><![CDATA[		$current_legend = phpbb_group_positions::GROUP_DISABLED;
+		$current_teampage = phpbb_group_positions::GROUP_DISABLED;
+
+		$legend = new phpbb_group_positions($db, 'legend');
+		$teampage = new phpbb_group_positions($db, 'teampage');
+		if ($group_id)
+		{
+			$current_legend = $legend->get_group_value($group_id);
+			$current_teampage = $teampage->get_group_value($group_id);
+		}
+
+		if (!empty($group_attributes['group_legend']))
+		{
+			if (($group_id && ($current_legend == phpbb_group_positions::GROUP_DISABLED)) || !$group_id)
+			{
+				// Old group currently not in the legend or new group, add at the end.
+				$group_attributes['group_legend'] = 1 + $legend->get_group_count();
+			}
+			else
+			{
+				// Group stayes in the legend
+				$group_attributes['group_legend'] = $current_legend;
+			}
+		}
+		else if ($group_id && ($current_legend > phpbb_group_positions::GROUP_DISABLED))
+		{
+			// Group is removed from the legend
+			$legend->delete_group($group_id, true);
+			$group_attributes['group_legend'] = phpbb_group_positions::GROUP_DISABLED;
+		}
+		else
+		{
+			$group_attributes['group_legend'] = phpbb_group_positions::GROUP_DISABLED;
+		}
+
+		if (!empty($group_attributes['group_teampage']))
+		{
+			if (($group_id && ($current_teampage == phpbb_group_positions::GROUP_DISABLED)) || !$group_id)
+			{
+				// Old group currently not on the teampage or new group, add at the end.
+				$group_attributes['group_teampage'] = 1 + $teampage->get_group_count();
+			}
+			else
+			{
+				// Group stayes on the teampage
+				$group_attributes['group_teampage'] = $current_teampage;
+			}
+		}
+		else if ($group_id && ($current_teampage > phpbb_group_positions::GROUP_DISABLED))
+		{
+			// Group is removed from the teampage
+			$teampage->delete_group($group_id, true);
+			$group_attributes['group_teampage'] = phpbb_group_positions::GROUP_DISABLED;
+		}
+		else
+		{
+			$group_attributes['group_teampage'] = phpbb_group_positions::GROUP_DISABLED;
+		}
+
+		// Unset the objects, we don't need them anymore.
+		unset($legend);
+		unset($teampage);
+
+]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 2763]]></comment>
+				<find><![CDATA[			group_user_del($group_id, $user_id_ary, $username_ary, $group_name);
+		}
+		else
+		{
+			$start = 0;
+		}
+		$db->sql_freeresult($result);
+	}
+	while ($start);
+]]></find>
+				<action type="after-add"><![CDATA[	// Delete group from legend and teampage
+	$legend = new phpbb_group_positions($db, 'legend');
+	$legend->delete_group($group_id);
+	unset($legend);
+	$teampage = new phpbb_group_positions($db, 'teampage');
+	$teampage->delete_group($group_id);
+	unset($teampage);
+]]></action>
+			</edit>
+		</open>
+		<open src="includes/acp/acp_groups.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 31]]></comment>
+				<find><![CDATA[		$user->add_lang('acp/groups');
+		$this->tpl_name = 'acp_groups';
+		$this->page_title = 'ACP_GROUPS_MANAGE';
+
+		$form_key = 'acp_groups';
+		add_form_key($form_key);]]></find>
+				<action type="after-add"><![CDATA[		if ($mode == 'position')
+		{
+			$this->manage_position();
+			return;
+		}]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 312]]></comment>
+				<find><![CDATA[						'receive_pm'		=> isset($_REQUEST['group_receive_pm']) ? 1 : 0,
+						'legend'			=> isset($_REQUEST['group_legend']) ? 1 : 0,]]></find>
+				<action type="after-add"><![CDATA[						'teampage'			=> isset($_REQUEST['group_teampage']) ? 1 : 0,]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 415]]></comment>
+				<find><![CDATA[						// group. This prevents existing group members being updated if no changes
+						// were made.]]></find>
+				<action type="after-add"><![CDATA[						// However there are some attributes that need to be set everytime, 
+						// otherwise the group gets removed from the feature. 
+						$set_attributes = array('legend', 'teampage');]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 429]]></comment>
+				<find><![CDATA[							'receive_pm'	=> 'int',
+							'legend'		=> 'int',]]></find>
+				<action type="after-add"><![CDATA[							'teampage'		=> 'int',]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 440]]></comment>
+				<find><![CDATA[							if (isset($submit_ary[$test]) && ($action == 'add' || $group_row['group_' . $test] != $submit_ary[$test]))]]></find>
+				<action type="replace-with"><![CDATA[							if (isset($submit_ary[$test]) && ($action == 'add' || $group_row['group_' . $test] != $submit_ary[$test] || in_array($test, $set_attributes)))]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 595]]></comment>
+				<find><![CDATA[					'GROUP_FOUNDER_MANAGE'	=> (isset($group_row['group_founder_manage']) && $group_row['group_founder_manage']) ? ' checked="checked"' : '',
+					'GROUP_LEGEND'			=> (isset($group_row['group_legend']) && $group_row['group_legend']) ? ' checked="checked"' : '',]]></find>
+				<action type="after-add"><![CDATA[					'GROUP_TEAMPAGE'		=> (isset($group_row['group_teampage']) && $group_row['group_teampage']) ? ' checked="checked"' : '',]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 807]]></comment>
+				<find><![CDATA[}
+
+?>]]></find>
+				<action type="replace-with"><![CDATA[
+	public function manage_position()
+	{
+		global $config, $db, $template, $user;
+
+		$this->tpl_name = 'acp_groups_position';
+		$this->page_title = 'ACP_GROUPS_POSITION';
+
+		$field = request_var('field', '');
+		$action = request_var('action', '');
+		$group_id = request_var('g', 0);
+
+		global $phpbb_root_path, $phpEx;
+		include($phpbb_root_path . 'includes/group_positions.' . $phpEx);
+
+		if ($field && !in_array($field, array('legend', 'teampage')))
+		{
+			// Invalid mode
+			trigger_error($user->lang['NO_MODE'] . adm_back_link($this->u_action), E_USER_WARNING);
+		}
+		else if ($field)
+		{
+			$group_position = new phpbb_group_positions($db, $field, $this->u_action);
+		}
+
+		switch ($action)
+		{
+			case 'set_config_legend':
+				set_config('legend_sort_groupname', request_var('legend_sort_groupname', 0));
+			break;
+
+			case 'set_config_teampage':
+				set_config('teampage_forums', request_var('teampage_forums', 0));
+				set_config('teampage_multiple', request_var('teampage_multiple', 0));
+			break;
+
+			case 'add':
+				$group_position->add_group($group_id);
+			break;
+
+			case 'delete':
+				$group_position->delete_group($group_id);
+			break;
+
+			case 'move_up':
+				$group_position->move_up($group_id);
+			break;
+
+			case 'move_down':
+				$group_position->move_down($group_id);
+			break;
+		}
+
+		$sql = 'SELECT group_id, group_name, group_colour, group_type, group_legend
+			FROM ' . GROUPS_TABLE . '
+			ORDER BY group_legend, group_name ASC';
+		$result = $db->sql_query($sql);
+
+		$s_group_select_legend = '';
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+			if ($row['group_legend'])
+			{
+				$template->assign_block_vars('legend', array(
+					'GROUP_NAME' => $group_name,
+					'GROUP_COLOUR' => ($row['group_colour']) ? ' style="color: #' . $row['group_colour'] . '"' : '',
+					'GROUP_TYPE' => $user->lang[phpbb_group_positions::group_type_language($row['group_type'])],
+
+					'U_MOVE_DOWN' => "{$this->u_action}&amp;field=legend&amp;action=move_down&amp;g=" . $row['group_id'],
+					'U_MOVE_UP' => "{$this->u_action}&amp;field=legend&amp;action=move_up&amp;g=" . $row['group_id'],
+					'U_DELETE' => "{$this->u_action}&amp;field=legend&amp;action=delete&amp;g=" . $row['group_id'],
+				));
+			}
+			else
+			{
+				$s_group_select_legend .= '<option value="' . (int) $row['group_id'] . '">' . $group_name . '</option>';
+			}
+		}
+		$db->sql_freeresult($result);
+
+		$sql = 'SELECT group_id, group_name, group_colour, group_type, group_teampage
+			FROM ' . GROUPS_TABLE . '
+			ORDER BY group_teampage, group_name ASC';
+		$result = $db->sql_query($sql);
+
+		$s_group_select_teampage = '';
+		while ($row = $db->sql_fetchrow($result))
+		{
+			$group_name = ($row['group_type'] == GROUP_SPECIAL) ? $user->lang['G_' . $row['group_name']] : $row['group_name'];
+			if ($row['group_teampage'])
+			{
+				$template->assign_block_vars('teampage', array(
+					'GROUP_NAME' => $group_name,
+					'GROUP_COLOUR' => ($row['group_colour']) ? ' style="color: #' . $row['group_colour'] . '"' : '',
+					'GROUP_TYPE' => $user->lang[phpbb_group_positions::group_type_language($row['group_type'])],
+
+					'U_MOVE_DOWN' => "{$this->u_action}&amp;field=teampage&amp;action=move_down&amp;g=" . $row['group_id'],
+					'U_MOVE_UP' => "{$this->u_action}&amp;field=teampage&amp;action=move_up&amp;g=" . $row['group_id'],
+					'U_DELETE' => "{$this->u_action}&amp;field=teampage&amp;action=delete&amp;g=" . $row['group_id'],
+				));
+			}
+			else
+			{
+				$s_group_select_teampage .= '<option value="' . (int) $row['group_id'] . '">' . $group_name . '</option>';
+			}
+		}
+		$db->sql_freeresult($result);
+
+		$template->assign_vars(array(
+			'U_ACTION' => $this->u_action,
+			'U_ACTION_LEGEND' => $this->u_action . '&amp;field=legend',
+			'U_ACTION_TEAMPAGE' => $this->u_action . '&amp;field=teampage',
+
+			'S_GROUP_SELECT_LEGEND' => $s_group_select_legend,
+			'S_GROUP_SELECT_TEAMPAGE' => $s_group_select_teampage,
+			'DISPLAY_FORUMS' => ($config['teampage_forums']) ? true : false,
+			'DISPLAY_MULTIPLE' => ($config['teampage_multiple']) ? true : false,
+			'LEGEND_SORT_GROUPNAME' => ($config['legend_sort_groupname']) ? true : false,
+		));
+	}
+}
+
+?>]]></action>
+			</edit>
+		</open>
+		<open src="includes/acp/info/acp_groups.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 22]]></comment>
+				<find><![CDATA[			'modes'		=> array(
+				'manage'		=> array('title' => 'ACP_GROUPS_MANAGE', 'auth' => 'acl_a_group', 'cat' => array('ACP_GROUPS')),]]></find>
+				<action type="after-add"><![CDATA[				'position'		=> array('title' => 'ACP_GROUPS_POSITION', 'auth' => 'acl_a_group', 'cat' => array('ACP_GROUPS')),]]></action>
+			</edit>
+		</open>
+		<open src="language/en/acp/common.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 101]]></comment>
+				<find><![CDATA[	'ACP_GROUPS_MANAGEMENT'			=> 'Group management',
+	'ACP_GROUPS_PERMISSIONS'		=> 'Groups’ permissions',]]></find>
+				<action type="after-add"><![CDATA[	'ACP_GROUPS_POSITION'			=> 'Manage group positions',]]></action>
+			</edit>
+		</open>
+		<open src="language/en/acp/groups.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 128]]></comment>
+				<find><![CDATA[	'USER_GROUP_DEFAULT_EXPLAIN'	=> 'Saying yes here will set this group as the default group for the added users.',
+	'USER_GROUP_LEADER'				=> 'Set as group leader',]]></find>
+				<action type="after-add"><![CDATA[	'GROUP_SPECIAL'					=> 'Pre-defined',
+	'GROUP_TEAMPAGE'				=> 'Display group on teampage',
+	'LEGEND_EXPLAIN'				=> 'These are the groups which are displayed in the group legend:',
+	'LEGEND_SETTINGS'				=> 'Legend settings',
+	'LEGEND_SORT_GROUPNAME'			=> 'Sort legend by group name',
+	'LEGEND_SORT_GROUPNAME_EXPLAIN'	=> 'The order below is ignored when this option is enabled.',
+
+	'MANAGE_LEGEND'			=> 'Manage group legend',
+	'MANAGE_TEAMPAGE'		=> 'Manage teampage',
+	'NO_GROUPS_ADDED'			=> 'No groups added yet.',
+	'SELECT_GROUP'				=> 'Select a group',
+	'TEAMPAGE_EXPLAIN'			=> 'These are the groups which are displayed on the teampage:',
+	'TEAMPAGE_FORUMS'			=> 'Display moderated forums',
+	'TEAMPAGE_FORUMS_EXPLAIN'	=> 'If set to yes, moderators will have a list with all of the forums where they have moderator permissions displayed in their row. This can be very database intensive for big boards.',
+	'TEAMPAGE_MULTIPLE'			=> 'Display users in all groups',
+	'TEAMPAGE_MULTIPLE_EXPLAIN'	=> 'If set to no, the users will only be displayed in their primary group (If the primary group is not listed, the users will be displayed in their first displayed group).',
+	'TEAMPAGE_SETTINGS'			=> 'Teampage settings',]]></action>
+			</edit>
+		</open>
+		<open src="styles/prosilver/template/memberlist_leaders.html">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 7]]></comment>
+				<find><![CDATA[<div class="forumbg">
+	<div class="inner"><span class="corners-top"><span></span></span>
+
+	<table class="table1" cellspacing="1">
+	<thead>
+	<tr>
+		<th class="name"><span class="rank-img">{L_RANK}&nbsp;</span>{L_ADMINISTRATORS}</th>
+		<th class="info">{L_PRIMARY_GROUP}</th>
+		<th class="info">{L_FORUMS}</th>
+	</tr>
+	</thead>
+	<tbody>
+<!-- BEGIN admin -->
+	<tr class="<!-- IF admin.S_ROW_COUNT is even -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+		<td><!-- IF admin.RANK_IMG --><span class="rank-img">{admin.RANK_IMG}</span><!-- ELSE --><span class="rank-img">{admin.RANK_TITLE}</span><!-- ENDIF -->{admin.USERNAME_FULL}</td>
+		<td class="info"><!-- IF admin.U_GROUP -->
+			<a<!-- IF admin.GROUP_COLOR --> style="font-weight: bold; color:#{admin.GROUP_COLOR}"<!-- ENDIF --> href="{admin.U_GROUP}">{admin.GROUP_NAME}</a>
+			<!-- ELSE -->
+				{admin.GROUP_NAME}
+			<!-- ENDIF --></td>
+		<td class="info">-</td>
+	</tr>
+<!-- BEGINELSE -->
+	<tr class="bg1">
+		<td colspan="3"><strong>{L_NO_ADMINISTRATORS}</strong></td>
+	</tr>
+<!-- END admin -->
+	</tbody>
+	</table>
+	
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+
+<div class="forumbg">
+	<div class="inner"><span class="corners-top"><span></span></span>
+	 
+	<table class="table1" cellspacing="1">
+	<thead>
+	<tr>
+		<th class="name">{L_MODERATORS}</th>
+		<th class="info">&nbsp;</th>
+		<th class="info">&nbsp;</th>
+	</tr>
+	</thead>
+	<tbody>
+<!-- BEGIN mod -->
+	<tr class="<!-- IF mod.S_ROW_COUNT is even -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+		<td><!-- IF mod.RANK_IMG --><span class="rank-img">{mod.RANK_IMG}</span><!-- ELSE --><span class="rank-img">{mod.RANK_TITLE}</span><!-- ENDIF -->{mod.USERNAME_FULL}</td>
+		<td class="info"><!-- IF mod.U_GROUP -->
+			<a<!-- IF mod.GROUP_COLOR --> style="font-weight: bold; color:#{mod.GROUP_COLOR}"<!-- ENDIF --> href="{mod.U_GROUP}">{mod.GROUP_NAME}</a>
+			<!-- ELSE -->
+				{mod.GROUP_NAME}
+			<!-- ENDIF --></td>
+		<td class="info"><!-- IF not mod.FORUMS -->{L_ALL_FORUMS}<!-- ELSE --><select style="width: 100%;">{mod.FORUMS}</select><!-- ENDIF --></td>
+	</tr>
+<!-- BEGINELSE -->
+	<tr class="bg1">
+		<td colspan="3"><strong>{L_NO_MODERATORS}</strong></td>
+	</tr>
+<!-- END mod -->
+	</tbody>
+	</table>
+	
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+	]]></find>
+				<action type="replace-with"><![CDATA[<!-- BEGIN group -->
+<div class="forumbg">
+	<div class="inner"><span class="corners-top"><span></span></span>
+
+	<table class="table1" cellspacing="1">
+	<thead>
+	<tr>
+		<th class="name"><span class="rank-img">{L_RANK}&nbsp;</span><!-- IF group.U_GROUP --><a href="{group.U_GROUP}">{group.GROUP_NAME}</a><!-- ELSE -->{group.GROUP_NAME}<!-- ENDIF --></th>
+		<th class="info">{L_PRIMARY_GROUP}</th>
+		<!-- IF S_DISPLAY_MODERATOR_FORUMS --><th class="info">{L_MODERATOR}</th><!-- ENDIF -->
+	</tr>
+	</thead>
+	<tbody>
+<!-- BEGIN user -->
+	<tr class="<!-- IF group.user.S_ROW_COUNT is even -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+		<td><!-- IF group.user.RANK_IMG --><span class="rank-img">{group.user.RANK_IMG}</span><!-- ELSE --><span class="rank-img">{group.user.RANK_TITLE}</span><!-- ENDIF -->{group.user.USERNAME_FULL}</td>
+		<td class="info"><!-- IF group.user.U_GROUP -->
+			<a<!-- IF group.user.GROUP_COLOR --> style="font-weight: bold; color: #{group.user.GROUP_COLOR}"<!-- ENDIF --> href="{group.user.U_GROUP}">{group.user.GROUP_NAME}</a>
+			<!-- ELSE -->
+				{group.user.GROUP_NAME}
+			<!-- ENDIF --></td>
+		<!-- IF S_DISPLAY_MODERATOR_FORUMS -->
+			<td class="info"><!-- IF group.user.FORUM_OPTIONS --><select style="width: 100%;">{group.user.FORUMS}</select><!-- ELSEIF group.user.FORUMS -->{group.user.FORUMS}<!-- ELSE -->-<!-- ENDIF --></td>
+		<!-- ENDIF -->
+	</tr>
+<!-- BEGINELSE -->
+	<tr class="bg1">
+		<td colspan="3"><strong>{L_NO_MEMBERS}</strong></td>
+	</tr>
+<!-- END user -->
+	</tbody>
+	</table>
+	
+	<span class="corners-bottom"><span></span></span></div>
+</div>
+<!-- END group -->
+
+]]></action>
+			</edit>
+		</open>
+		<php-installer><![CDATA[install/index.php]]></php-installer>
+		<diy-instructions lang="en"><![CDATA[After the install refresh the styles and purge the cache.]]></diy-instructions>
+	</action-group>
+</mod>
