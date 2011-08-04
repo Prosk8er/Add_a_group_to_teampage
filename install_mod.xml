@@ -636,7 +636,9 @@ $result = $db->sql_query($sql);]]></action>
 	}
 	while ($start);
 ]]></find>
-				<action type="after-add"><![CDATA[	// Delete group from legend and teampage
+				<action type="after-add"><![CDATA[	global $phpEx;
+	include($phpbb_root_path . 'includes/group_positions.' . $phpEx);
+	// Delete group from legend and teampage
 	$legend = new phpbb_group_positions($db, 'legend');
 	$legend->delete_group($group_id);
 	unset($legend);
