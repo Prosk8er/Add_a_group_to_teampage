@@ -1,0 +1,67 @@
+open: memberlist.php
+find:
+			'SELECT'	=> 'u.user_id, u.group_id as default_group, u.username, u.username_clean, u.user_colour, u.user_rank, u.user_posts, u.user_allow_pm, g.group_id',
+replace with:
+			'SELECT'	=> 'u.user_id, u.group_id as default_group, u.username, u.username_clean, u.user_colour, u.user_flag, u.user_rank, u.user_posts, u.user_allow_pm, g.group_id',
+find:
+						$rank_title = $rank_img = $rank_img_src = '';
+						get_user_rank($row['user_rank'], (($row['user_id'] == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
+before add:
+						$flag_country = $flag_code = $flag_img = $flag_img_src = '';
+						get_user_flag($row['user_flag'], $flag_country, $flag_code, $flag_img, $flag_img_src);
+find:
+						$template->assign_block_vars('group.user', array(
+							'USER_ID'		=> $row['user_id'],
+after add:
+							'FLAG_COUNTRY'	=> $flag_country,
+							'FLAG_CODE'		=> $flag_code,
+find:
+							'U_GROUP'		=> $groups_ary[$row['default_group']]['u_group'],
+before add:
+							'FLAG_IMG'		=> ($flag_img) ? $flag_img : '---',
+							'FLAG_IMG_SRC'	=> $flag_img_src,
+
+
+open: includes/functions_display.php
+
+find:
+
+	global $flags, $config;
+
+replace with:
+
+	global $flags, $config, $phpbb_root_path;
+
+
+open: styles/prosilver/template/memberlist_leaders.html
+find:
+		<th class="name"><span class="rank-img">{L_RANK}&nbsp;</span><!-- IF group.U_GROUP --><a href="{group.U_GROUP}">{group.GROUP_NAME}</a><!-- ELSE -->{group.GROUP_NAME}<!-- ENDIF --></th>
+after add:
+		<th nowrap="nowrap">{L_COUNTRY}</th>
+find:
+		<td><!-- IF group.user.RANK_IMG --><span class="rank-img">{group.user.RANK_IMG}</span><!-- ELSE --><span class="rank-img">{group.user.RANK_TITLE}</span><!-- ENDIF -->{group.user.USERNAME_FULL}</td>
+after add:
+		<td align="center" nowrap="nowrap"><!-- IF group.user.FLAG_IMG -->{group.user.FLAG_IMG}<!-- ELSE -->{group.user.FLAG_COUNTRY} ({group.user.FLAG_CODE})<!-- ENDIF --></td>
+find:
+		<td colspan="3"><strong>{L_NO_MEMBERS}</strong></td>
+replace with:
+		<td colspan="4"><strong>{L_NO_MEMBERS}</strong></td>
+
+
+open: styles/subsilver2/template/memberlist_leaders.html
+find:
+	<th nowrap="nowrap" width="15%">{L_RANK}</th>
+before add:
+	<th nowrap="nowrap">{L_COUNTRY}</th>
+find:
+	<td colspan="5"><b class="gensmall"><!-- IF group.U_GROUP --><a href="{group.U_GROUP}">{group.GROUP_NAME}</a><!-- ELSE -->{group.GROUP_NAME}<!-- ENDIF --></b></td>
+replace with:
+	<td colspan="6"><b class="gensmall"><!-- IF group.U_GROUP --><a href="{group.U_GROUP}">{group.GROUP_NAME}</a><!-- ELSE -->{group.GROUP_NAME}<!-- ENDIF --></b></td>
+find:
+	<td class="gen" align="center"><!-- IF group.user.RANK_IMG -->{group.user.RANK_IMG}<!-- ELSE -->{group.user.RANK_TITLE}<!-- ENDIF --></td>
+before add:
+	<td class="gen" align="center">{group.user.FLAG_IMG}</td>
+find:
+		<td class="row1" colspan="5" align="center"><span class="gen">{L_NO_MEMBERS}</span></td>
+replace with:
+		<td class="row1" colspan="6" align="center"><span class="gen">{L_NO_MEMBERS}</span></td>

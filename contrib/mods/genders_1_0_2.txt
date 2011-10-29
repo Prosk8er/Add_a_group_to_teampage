@@ -1,0 +1,17 @@
+Open: memberlist.php
+Find:
+, u.user_allow_pm
+In-line Add after:
+, u.user_gender
+
+Open: styles/prosilver/template/memberlist_leaders.html
+Find:
+{group.user.USERNAME_FULL}
+In-line Add after:
+ {group.user.USER_GENDER}
+
+Open: styles/subsilver2/template/memberlist_leaders.html
+Find:
+{group.user.USERNAME_FULL}</strong>
+In-line Add after:
+ {group.user.USER_GENDER}
