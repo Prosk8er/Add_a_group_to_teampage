@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+		<title lang="en"><![CDATA[Update team page & Legend repositioning 0.1.0 to 0.2.0]]></title>
+		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.9.]]></description>
+		<author-notes lang="en"><![CDATA[Thank phpbb for there awesome code and mike over at http://stargate-portal.com for his help with the umil installer.]]></author-notes>
+		<author-group>
+			<author>
+				<realname><![CDATA[Tyler]]></realname>
+				<username><![CDATA[bprsk8r4272]]></username>
+				<homepage><![CDATA[http://gotskillslounge.com]]></homepage>
+				<email><![CDATA[prosk8er@gotskillslounge.com]]></email>
+			</author>
+			<author>
+				<realname><![CDATA[Mike]]></realname>
+				<username><![CDATA[michaelo]]></username>
+				<homepage><![CDATA[http://stargate-portal.com]]></homepage>
+			</author>
+			<author>
+				<realname><![CDATA[phpBB Group]]></realname>
+				<username phpbbcom="no"><![CDATA[phpBB Group]]></username>
+				<homepage><![CDATA[http://www.phpbb.com/]]></homepage>
+			</author>
+		</author-group>
+		<mod-version>0.2.0</mod-version>
+		<installation>
+			<level>easy</level>
+			<time>100</time>
+			<target-version>3.0.9</target-version>
+		</installation>
+		<history>
+			<entry>
+				<date>2011-11-06</date>
+				<rev-version>0.2.0</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated changes from 3.1.0-dev]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-07-23</date>
+				<rev-version>0.1.0</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Initial Release]]></change>
+				</changelog>
+			</entry>
+		</history>
+	</header>
+	<action-group>
+		<copy>
+			<file from="root/adm/style/acp_groups_position.html" to="adm/style/acp_groups_position.html"/>
+			<file from="root/install/index.php" to="install/index.php"/>
+			<file from="root/umil/*.*" to="umil/*.*"/>
+		</copy>
+		<open src="memberlist.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 232]]></comment>
+				<find><![CDATA[						if (!$config['teampage_multiple'] && ($group_id != $groups_ary[$row['default_group']]['group_id']) && $groups_ary[$row['default_group']]['group_teampage'])]]></find>
+				<action type="replace-with"><![CDATA[						if ($config['teampage_memberships'] == 1 && ($group_id != $groups_ary[$row['default_group']]['group_id']) && $groups_ary[$row['default_group']]['group_teampage'])]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 262]]></comment>
+				<find><![CDATA[						if (!$config['teampage_multiple'])]]></find>
+				<action type="replace-with"><![CDATA[						if ($config['teampage_memberships'] != 2)]]></action>
+			</edit>
+		</open>
+		<open src="includes/acp/acp_groups.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 839]]></comment>
+				<find><![CDATA[				set_config('teampage_multiple', request_var('teampage_multiple', 0));]]></find>
+				<action type="replace-with"><![CDATA[				set_config('teampage_memberships', request_var('teampage_memberships', 0));]]></action>
+			</edit>
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 920]]></comment>
+				<find><![CDATA[			'S_GROUP_SELECT_LEGEND' => $s_group_select_legend,
+			'S_GROUP_SELECT_TEAMPAGE' => $s_group_select_teampage,
+			'DISPLAY_FORUMS' => ($config['teampage_forums']) ? true : false,
+			'DISPLAY_MULTIPLE' => ($config['teampage_multiple']) ? true : false,
+			'LEGEND_SORT_GROUPNAME' => ($config['legend_sort_groupname']) ? true : false,]]></find>
+				<action type="replace-with"><![CDATA[			'S_GROUP_SELECT_LEGEND'		=> $s_group_select_legend,
+			'S_GROUP_SELECT_TEAMPAGE'	=> $s_group_select_teampage,
+			'DISPLAY_FORUMS'			=> ($config['teampage_forums']) ? true : false,
+			'DISPLAY_MEMBERSHIPS'		=> $config['teampage_memberships'],
+			'LEGEND_SORT_GROUPNAME'		=> ($config['legend_sort_groupname']) ? true : false,]]></action>
+			</edit>
+		</open>
+		<open src="language/en/acp/groups.php">
+			<edit>
+				<comment lang="en"><![CDATA[Around Line 141]]></comment>
+				<find><![CDATA[	'TEAMPAGE_EXPLAIN'			=> 'These are the groups which are displayed on the teampage:',
+	'TEAMPAGE_FORUMS'			=> 'Display moderated forums',
+	'TEAMPAGE_FORUMS_EXPLAIN'	=> 'If set to yes, moderators will have a list with all of the forums where they have moderator permissions displayed in their row. This can be very database intensive for big boards.',
+	'TEAMPAGE_MULTIPLE'			=> 'Display users in all groups',
+	'TEAMPAGE_MULTIPLE_EXPLAIN'	=> 'If set to no, the users will only be displayed in their primary group (If the primary group is not listed, the users will be displayed in their first displayed group).',]]></find>
+				<action type="replace-with"><![CDATA[	'TEAMPAGE_DISP_ALL'			=> 'All memberships',
+	'TEAMPAGE_DISP_DEFAULT'		=> 'Users default group only',
+	'TEAMPAGE_DISP_FIRST'		=> 'First membership only',
+	'TEAMPAGE_EXPLAIN'			=> 'These are the groups which are displayed on the teampage:',
+	'TEAMPAGE_FORUMS'			=> 'Display moderated forums',
+	'TEAMPAGE_FORUMS_EXPLAIN'	=> 'If set to yes, moderators will have a list with all of the forums where they have moderator permissions displayed in their row. This can be very database intensive for big boards.',
+	'TEAMPAGE_MEMBERSHIPS'		=> 'Display user memberships',]]></action>
+			</edit>
+		</open>
+		<php-installer><![CDATA[install/index.php]]></php-installer>
+		<diy-instructions lang="en"><![CDATA[After the install refresh the styles and purge the cache.]]></diy-instructions>
+	</action-group>
+</mod>

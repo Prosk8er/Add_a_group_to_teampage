@@ -27,13 +27,20 @@
 				<homepage><![CDATA[http://www.phpbb.com/]]></homepage>
 			</author>
 		</author-group>
-		<mod-version>0.1.0</mod-version>
+		<mod-version>0.2.0</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>900</time>
 			<target-version>3.0.9</target-version>
 		</installation>
 		<history>
+			<entry>
+				<date>2011-11-06</date>
+				<rev-version>0.2.0</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated changes from 3.1.0-dev]]></change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-07-23</date>
 				<rev-version>0.1.0</rev-version>
@@ -44,6 +51,7 @@
 		</history>
 		<link-group>
 			<link type="template" href="contrib/subsilver2.xml" lang="en">Subsilver2</link>
+			<link type="contrib" href="contrib/update/update_0.1.0_to_0.2.0.xml" lang="en">Update 0.1.0 to 0.2.0</link>
 		</link-group>
 	</header>
 	<action-group>
@@ -431,7 +439,7 @@ $result = $db->sql_query($sql);]]></action>
 					if (isset($user_ary[$user_id]))
 					{
 						$row = $user_ary[$user_id];
-						if (!$config['teampage_multiple'] && ($group_id != $groups_ary[$row['default_group']]['group_id']) && $groups_ary[$row['default_group']]['group_teampage'])
+						if ($config['teampage_memberships'] == 1 && ($group_id != $groups_ary[$row['default_group']]['group_id']) && $groups_ary[$row['default_group']]['group_teampage'])
 						{
 							// Display users in their primary group, instead of the first group, when it is displayed on the teampage.
 							continue;
@@ -461,7 +469,7 @@ $result = $db->sql_query($sql);]]></action>
 							'U_VIEW_PROFILE'	=> get_username_string('profile', $row['user_id'], $row['username'], $row['user_colour']),
 						));
 
-						if (!$config['teampage_multiple'])
+						if ($config['teampage_memberships'] != 2)
 						{
 							unset($user_ary[$user_id]);
 						}
@@ -732,7 +740,7 @@ $result = $db->sql_query($sql);]]></action>
 
 			case 'set_config_teampage':
 				set_config('teampage_forums', request_var('teampage_forums', 0));
-				set_config('teampage_multiple', request_var('teampage_multiple', 0));
+				set_config('teampage_memberships', request_var('teampage_memberships', 0));
 			break;
 
 			case 'add':
@@ -813,11 +821,11 @@ $result = $db->sql_query($sql);]]></action>
 			'U_ACTION_LEGEND' => $this->u_action . '&amp;field=legend',
 			'U_ACTION_TEAMPAGE' => $this->u_action . '&amp;field=teampage',
 
-			'S_GROUP_SELECT_LEGEND' => $s_group_select_legend,
-			'S_GROUP_SELECT_TEAMPAGE' => $s_group_select_teampage,
-			'DISPLAY_FORUMS' => ($config['teampage_forums']) ? true : false,
-			'DISPLAY_MULTIPLE' => ($config['teampage_multiple']) ? true : false,
-			'LEGEND_SORT_GROUPNAME' => ($config['legend_sort_groupname']) ? true : false,
+			'S_GROUP_SELECT_LEGEND'		=> $s_group_select_legend,
+			'S_GROUP_SELECT_TEAMPAGE'	=> $s_group_select_teampage,
+			'DISPLAY_FORUMS'			=> ($config['teampage_forums']) ? true : false,
+			'DISPLAY_MEMBERSHIPS'		=> $config['teampage_memberships'],
+			'LEGEND_SORT_GROUPNAME'		=> ($config['legend_sort_groupname']) ? true : false,
 		));
 	}
 }
@@ -857,11 +865,13 @@ $result = $db->sql_query($sql);]]></action>
 	'MANAGE_TEAMPAGE'		=> 'Manage teampage',
 	'NO_GROUPS_ADDED'			=> 'No groups added yet.',
 	'SELECT_GROUP'				=> 'Select a group',
+	'TEAMPAGE_DISP_ALL'			=> 'All memberships',
+	'TEAMPAGE_DISP_DEFAULT'		=> 'User’s default group only',
+	'TEAMPAGE_DISP_FIRST'		=> 'First membership only',
 	'TEAMPAGE_EXPLAIN'			=> 'These are the groups which are displayed on the teampage:',
 	'TEAMPAGE_FORUMS'			=> 'Display moderated forums',
 	'TEAMPAGE_FORUMS_EXPLAIN'	=> 'If set to yes, moderators will have a list with all of the forums where they have moderator permissions displayed in their row. This can be very database intensive for big boards.',
-	'TEAMPAGE_MULTIPLE'			=> 'Display users in all groups',
-	'TEAMPAGE_MULTIPLE_EXPLAIN'	=> 'If set to no, the users will only be displayed in their primary group (If the primary group is not listed, the users will be displayed in their first displayed group).',
+	'TEAMPAGE_MEMBERSHIPS'		=> 'Display user memberships',
 	'TEAMPAGE_SETTINGS'			=> 'Teampage settings',]]></action>
 			</edit>
 		</open>

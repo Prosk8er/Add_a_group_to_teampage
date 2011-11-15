@@ -70,6 +70,17 @@ $versions = array(
 			),
 		),
 	),
+
+	// Version 0.2.0-RC1
+	'0.2.0-RC1'	=> array(
+		'config_remove' => array(
+			array('teampage_multiple'),
+		),
+
+		'config_add' => array(
+			array('teampage_memberships', 1),
+		),
+	),
 );
 
 // Include the UMIL Auto file and everything else will be handled automatically.
