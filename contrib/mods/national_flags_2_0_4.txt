@@ -1,0 +1,32 @@
+open: memberlist.php
+find:
+						$rank_title = $rank_img = $rank_img_src = '';
+						get_user_rank($row['user_rank'], (($row['user_id'] == ANONYMOUS) ? false : $row['user_posts']), $rank_title, $rank_img, $rank_img_src);
+
+before add:
+
+						//Begin: National_Flag
+						if (!empty($config['allow_flags']) && !empty($row['user_flag']))
+						{
+							$user_flag = get_user_flag($row['user_flag']);
+							++$flag_count;
+						}
+						else
+						{
+							$user_flag = '';
+						}			
+						//End: National_Flag
+
+open: styles/prosilver/template/memberlist_leaders.html
+find:
+		<th class="name"><span class="rank-img">{L_RANK}&nbsp;</span><!-- IF group.U_GROUP --><a href="{group.U_GROUP}">{group.GROUP_NAME}</a><!-- ELSE -->{group.GROUP_NAME}<!-- ENDIF --></th>
+after add:
+		<!-- IF S_USER_FLAG --><th nowrap="nowrap">{L_FLAG}</th><!-- ENDIF -->
+find:
+		<td><!-- IF group.user.RANK_IMG --><span class="rank-img">{group.user.RANK_IMG}</span><!-- ELSE --><span class="rank-img">{group.user.RANK_TITLE}</span><!-- ENDIF -->{group.user.USERNAME_FULL}</td>
+after add:
+		<!-- IF S_USER_FLAG --><td><!-- IF group.user.USER_FLAG--><span class="flag">{group.user.USER_FLAG}</span><!-- ENDIF --></td><!-- ENDIF -->
+find:
+		<td colspan="3"><strong>{L_NO_MEMBERS}</strong></td>
+replace with:
+		<td colspan="4"><strong>{L_NO_MEMBERS}</strong></td>

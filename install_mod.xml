@@ -681,8 +681,8 @@ $result = $db->sql_query($sql);]]></action>
 				<comment lang="en"><![CDATA[Around Line 415]]></comment>
 				<find><![CDATA[						// group. This prevents existing group members being updated if no changes
 						// were made.]]></find>
-				<action type="after-add"><![CDATA[						// However there are some attributes that need to be set everytime, 
-						// otherwise the group gets removed from the feature. 
+				<action type="after-add"><![CDATA[						// However there are some attributes that need to be set everytime,
+						// otherwise the group gets removed from the feature.
 						$set_attributes = array('legend', 'teampage');]]></action>
 			</edit>
 			<edit>
