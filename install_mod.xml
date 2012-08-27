@@ -7,7 +7,7 @@
 		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
 		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
 		<title lang="en"><![CDATA[Add groups in team page & Legend repositioning]]></title>
-		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.10.]]></description>
+		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.11.]]></description>
 		<author-notes lang="en"><![CDATA[Thank phpbb for there awesome code and mike over at http://stargate-portal.com for his help with the umil installer.]]></author-notes>
 		<author-group>
 			<author>
@@ -27,13 +27,20 @@
 				<homepage><![CDATA[http://www.phpbb.com/]]></homepage>
 			</author>
 		</author-group>
-		<mod-version>0.2.0</mod-version>
+		<mod-version>0.2.1</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>900</time>
-			<target-version>3.0.10</target-version>
+			<target-version>3.0.11</target-version>
 		</installation>
 		<history>
+			<entry>
+				<date>2012-08-25</date>
+				<rev-version>0.2.1</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated for phpbb 3.0.11]]></change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-11-06</date>
 				<rev-version>0.2.0</rev-version>
@@ -52,6 +59,7 @@
 		<link-group>
 			<link type="template" href="contrib/subsilver2.xml" lang="en">Subsilver2</link>
 			<link type="contrib" href="contrib/update/update_0.1.0_to_0.2.0.xml" lang="en">Update 0.1.0 to 0.2.0</link>
+			<link type="contrib" href="contrib/update/update_0.2.0_to_0.2.1.xml" lang="en">Update 0.2.0 to 0.2.1</link>
 		</link-group>
 	</header>
 	<action-group>
@@ -845,7 +853,7 @@ $result = $db->sql_query($sql);]]></action>
 			<edit>
 				<comment lang="en"><![CDATA[Around Line 101]]></comment>
 				<find><![CDATA[	'ACP_GROUPS_MANAGEMENT'			=> 'Group management',
-	'ACP_GROUPS_PERMISSIONS'		=> 'Groups’ permissions',]]></find>
+	'ACP_GROUPS_PERMISSIONS'		=> 'Group permissions',]]></find>
 				<action type="after-add"><![CDATA[	'ACP_GROUPS_POSITION'			=> 'Manage group positions',]]></action>
 			</edit>
 		</open>
@@ -878,7 +886,7 @@ $result = $db->sql_query($sql);]]></action>
 		<open src="styles/prosilver/template/memberlist_leaders.html">
 			<edit>
 				<comment lang="en"><![CDATA[Around Line 7]]></comment>
-				<find><![CDATA[<div class="forumbg">
+				<find><![CDATA[<div class="forumbg forumbg-table">
 	<div class="inner"><span class="corners-top"><span></span></span>
 
 	<table class="table1" cellspacing="1">
@@ -911,7 +919,7 @@ $result = $db->sql_query($sql);]]></action>
 	<span class="corners-bottom"><span></span></span></div>
 </div>
 
-<div class="forumbg">
+<div class="forumbg forumbg-table">
 	<div class="inner"><span class="corners-top"><span></span></span>
 	 
 	<table class="table1" cellspacing="1">
@@ -945,7 +953,7 @@ $result = $db->sql_query($sql);]]></action>
 </div>
 	]]></find>
 				<action type="replace-with"><![CDATA[<!-- BEGIN group -->
-<div class="forumbg">
+<div class="forumbg forumbg-table">
 	<div class="inner"><span class="corners-top"><span></span></span>
 
 	<table class="table1" cellspacing="1">

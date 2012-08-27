@@ -81,6 +81,10 @@ $versions = array(
 			array('teampage_memberships', 1),
 		),
 	),
+
+	// Version 0.2.1-RC1
+	'0.2.1-RC1'	=> array(
+	),
 );
 
 // Include the UMIL Auto file and everything else will be handled automatically.

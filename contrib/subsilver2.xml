@@ -7,7 +7,7 @@
 		<meta name="generator" content="MODX file generated with PP MODX Creator by tumba25 (online version)"/>
 		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
 		<title lang="en"><![CDATA[Add groups in team page & Legend repositioning]]></title>
-		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.9.]]></description>
+		<description lang="en"><![CDATA[With this mod you have the ability to add a group to the team page and legend repositioning taken right out of phpbb 3.1.0-dev and made to work with phpbb 3.0.11.]]></description>
 		<author-notes lang="en"><![CDATA[Thank phpbb for there awesome code and mike over at http://stargate-portal.com for his help with the umil installer.]]></author-notes>
 		<author-group>
 			<author>
@@ -27,13 +27,27 @@
 				<homepage><![CDATA[http://www.phpbb.com/]]></homepage>
 			</author>
 		</author-group>
-		<mod-version>0.2.0</mod-version>
+		<mod-version>0.2.1</mod-version>
 		<installation>
 			<level>easy</level>
 			<time>100</time>
-			<target-version>3.0.10</target-version>
+			<target-version>3.0.11</target-version>
 		</installation>
 		<history>
+			<entry>
+				<date>2012-08-25</date>
+				<rev-version>0.2.1</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated for phpbb 3.0.11]]></change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-11-06</date>
+				<rev-version>0.2.0</rev-version>
+				<changelog lang="en">
+					<change><![CDATA[Updated changes from 3.1.0-dev]]></change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-07-23</date>
 				<rev-version>0.1.0</rev-version>
