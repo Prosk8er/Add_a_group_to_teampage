@@ -85,6 +85,10 @@ $versions = array(
 	// Version 0.2.1-RC1
 	'0.2.1-RC1'	=> array(
 	),
+	// Version 0.2.2-RC1
+	'0.2.2-RC1'	=> array(
+		'cache_purge' => array('', 'imageset', 'template', 'theme'),
+	),
 );
 
 // Include the UMIL Auto file and everything else will be handled automatically.
